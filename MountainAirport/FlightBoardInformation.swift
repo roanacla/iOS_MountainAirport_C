@@ -45,22 +45,20 @@ struct FlightBoardInformation : View {
       Text("\(flight.direction == .arrival ? "From: " : "To: ") \(flight.otherAirport)")
       Text(flight.flightStatus)
       Button(action: {
+        withAnimation(.default) {
         self.showDetails.toggle()
+        }
       }) {
         HStack {
           Text(showDetails ? "Hide Details" : "Show Details")
           Spacer()
           Image(systemName: "chevron.up.square")
             .scaleEffect(showDetails ? 2 : 1)
-            .animation(.spring())
             .rotationEffect(.degrees(showDetails ? 0 : 180))
-            .animation(.easeInOut)
         }
       }
       FlightDetails(flight: flight)
         .offset(x: showDetails ? 0 : -UIScreen.main.bounds.width)
-        .animation(.spring(response: 0.55, dampingFraction: 0.45,
-                           blendDuration: 0))
       Spacer()
     }.font(.headline).padding(10)
   }
