@@ -48,20 +48,19 @@ struct FlightBoardInformation : View {
         self.showDetails.toggle()
       }) {
         HStack {
-          if showDetails {
-            Text("Hide Details")
-            Spacer()
-            Image(systemName: "chevron.up.square")
-          } else {
-            Text("Show Details")
-            Spacer()
-            Image(systemName: "chevron.down.square")
-          }
+          Text(showDetails ? "Hide Details" : "Show Details")
+          Spacer()
+          Image(systemName: "chevron.up.square")
+            .scaleEffect(showDetails ? 2 : 1)
+            .animation(.spring())
+            .rotationEffect(.degrees(showDetails ? 0 : 180))
+            .animation(.easeInOut)
         }
       }
-      if showDetails {
-        FlightDetails(flight: flight)
-      }
+      FlightDetails(flight: flight)
+        .offset(x: showDetails ? 0 : -UIScreen.main.bounds.width)
+        .animation(.spring(response: 0.55, dampingFraction: 0.45,
+                           blendDuration: 0))
       Spacer()
     }.font(.headline).padding(10)
   }
