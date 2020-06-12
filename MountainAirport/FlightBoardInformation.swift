@@ -32,6 +32,9 @@ struct FlightBoardInformation : View {
   @State private var showDetails = false
   var flight: FlightInformation
   @Binding var dismissFlag: Bool
+  var flightDetailAnimation : Animation { //Extract animation in a variable
+    Animation.easeInOut
+  }
   
   var body: some View {
     VStack(alignment: .leading) {
@@ -45,8 +48,8 @@ struct FlightBoardInformation : View {
       Text("\(flight.direction == .arrival ? "From: " : "To: ") \(flight.otherAirport)")
       Text(flight.flightStatus)
       Button(action: {
-        withAnimation(.default) {
-        self.showDetails.toggle()
+        withAnimation {
+          self.showDetails.toggle()
         }
       }) {
         HStack {
@@ -54,11 +57,15 @@ struct FlightBoardInformation : View {
           Spacer()
           Image(systemName: "chevron.up.square")
             .scaleEffect(showDetails ? 2 : 1)
+            .animation(.spring())
             .rotationEffect(.degrees(showDetails ? 0 : 180))
+            .animation(flightDetailAnimation)//Use custom animation. 
         }
       }
-      FlightDetails(flight: flight)
-        .offset(x: showDetails ? 0 : -UIScreen.main.bounds.width)
+      if showDetails {
+        FlightDetails(flight: flight)
+          .transition(.flightDetailsTransition)//Add a transition to a view.
+      }
       Spacer()
     }.font(.headline).padding(10)
   }
@@ -70,5 +77,15 @@ struct FlightBoardDetail_Previews : PreviewProvider {
   
   static var previews: some View {
     FlightBoardInformation(flight: FlightInformation.generateFlights()[0], dismissFlag: $isPresented)
+  }
+}
+
+extension AnyTransition { // This is how you starct a transition out of the View.
+  static var flightDetailsTransition: AnyTransition {
+    let insertion = AnyTransition.move(edge: .trailing)
+      .combined(with: .opacity)
+    let removal = AnyTransition.scale(scale: 1.0)
+      .combined(with: .opacity)
+    return .asymmetric(insertion: insertion, removal: removal) //Async Transitions
   }
 }
